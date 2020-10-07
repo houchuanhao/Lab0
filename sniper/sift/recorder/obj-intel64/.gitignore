@@ -1,0 +1,12 @@
+/bbv_count.o
+/emulation.o
+/globals.o
+/papi.o
+/pinboost_debug.o
+/recorder_base.o
+/recorder_control.o
+/sift_recorder
+/sift_recorder.o
+/syscall_modeling.o
+/threads.o
+/trace_rtn.o

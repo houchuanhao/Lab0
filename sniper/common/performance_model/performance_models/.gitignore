@@ -1,0 +1,10 @@
+/interval_performance_model.d
+/interval_performance_model.o
+/micro_op_performance_model.d
+/micro_op_performance_model.o
+/oneipc_performance_model.d
+/oneipc_performance_model.o
+/rob_performance_model.d
+/rob_performance_model.o
+/rob_smt_performance_model.d
+/rob_smt_performance_model.o

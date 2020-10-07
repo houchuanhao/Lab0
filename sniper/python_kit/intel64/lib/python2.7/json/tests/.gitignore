@@ -1,0 +1,17 @@
+/__init__.pyc
+/test_check_circular.pyc
+/test_decode.pyc
+/test_default.pyc
+/test_dump.pyc
+/test_encode_basestring_ascii.pyc
+/test_fail.pyc
+/test_float.pyc
+/test_indent.pyc
+/test_pass1.pyc
+/test_pass2.pyc
+/test_pass3.pyc
+/test_recursion.pyc
+/test_scanstring.pyc
+/test_separators.pyc
+/test_speedups.pyc
+/test_unicode.pyc

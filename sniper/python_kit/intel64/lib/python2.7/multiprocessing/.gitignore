@@ -1,0 +1,12 @@
+/__init__.pyc
+/connection.pyc
+/forking.pyc
+/heap.pyc
+/managers.pyc
+/pool.pyc
+/process.pyc
+/queues.pyc
+/reduction.pyc
+/sharedctypes.pyc
+/synchronize.pyc
+/util.pyc

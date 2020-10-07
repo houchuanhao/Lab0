@@ -1,0 +1,4 @@
+/fault_injection.d
+/fault_injection.o
+/fault_injector_random.d
+/fault_injector_random.o

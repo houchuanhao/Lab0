@@ -1,0 +1,11 @@
+/libsift.a
+/sift_reader.d
+/sift_reader.o
+/sift_utils.d
+/sift_utils.o
+/sift_writer.d
+/sift_writer.o
+/siftdump
+/siftdump.o
+/zfstream.d
+/zfstream.o

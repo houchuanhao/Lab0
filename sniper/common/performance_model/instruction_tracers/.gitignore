@@ -1,0 +1,10 @@
+/instruction_tracer.d
+/instruction_tracer.o
+/instruction_tracer_fpstats.d
+/instruction_tracer_fpstats.o
+/instruction_tracer_print.d
+/instruction_tracer_print.o
+/loop_profiler.d
+/loop_profiler.o
+/loop_tracer.d
+/loop_tracer.o

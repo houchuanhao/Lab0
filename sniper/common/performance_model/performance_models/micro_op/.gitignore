@@ -1,0 +1,12 @@
+/dynamic_micro_op.d
+/dynamic_micro_op.o
+/instruction_decoder.d
+/instruction_decoder.o
+/instruction_decoder_wlib.d
+/instruction_decoder_wlib.o
+/memory_dependencies.d
+/memory_dependencies.o
+/micro_op.d
+/micro_op.o
+/register_dependencies.d
+/register_dependencies.o

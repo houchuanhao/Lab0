@@ -1,0 +1,8 @@
+/periodic_sampling.d
+/periodic_sampling.o
+/sampling_algorithm.d
+/sampling_algorithm.o
+/sampling_manager.d
+/sampling_manager.o
+/sampling_provider.d
+/sampling_provider.o

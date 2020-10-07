@@ -1,0 +1,11 @@
+/__init__.pyc
+/ast.pyc
+/consts.pyc
+/future.pyc
+/misc.pyc
+/pyassem.pyc
+/pycodegen.pyc
+/symbols.pyc
+/syntax.pyc
+/transformer.pyc
+/visitor.pyc

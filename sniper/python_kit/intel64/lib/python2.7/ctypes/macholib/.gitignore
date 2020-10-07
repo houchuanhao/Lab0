@@ -1,0 +1,7 @@
+/README.ctypes
+/__init__.pyc
+/dyld.pyc
+/dylib.pyc
+/fetch_macholib
+/fetch_macholib.bat
+/framework.pyc

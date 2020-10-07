@@ -1,0 +1,16 @@
+/cache_atd.d
+/cache_atd.o
+/cache_cntlr.d
+/cache_cntlr.o
+/ghb_prefetcher.d
+/ghb_prefetcher.o
+/memory_manager.d
+/memory_manager.o
+/nuca_cache.d
+/nuca_cache.o
+/prefetcher.d
+/prefetcher.o
+/simple_prefetcher.d
+/simple_prefetcher.o
+/tlb.d
+/tlb.o

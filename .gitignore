@@ -1,1 +1,5 @@
 *.tar.gz
+/sim.cfg
+/sim.info
+/sim.out
+/sim.stats.sqlite3

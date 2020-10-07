@@ -1,0 +1,6 @@
+/branch_predictor_return_value.d
+/branch_predictor_return_value.o
+/one_bit_branch_predictor.d
+/one_bit_branch_predictor.o
+/pentium_m_branch_predictor.d
+/pentium_m_branch_predictor.o

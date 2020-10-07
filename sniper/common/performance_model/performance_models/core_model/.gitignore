@@ -1,0 +1,10 @@
+/core_model.d
+/core_model.o
+/core_model_boom_v1.d
+/core_model_boom_v1.o
+/core_model_nehalem.d
+/core_model_nehalem.o
+/dynamic_micro_op_boom_v1.d
+/dynamic_micro_op_boom_v1.o
+/dynamic_micro_op_nehalem.d
+/dynamic_micro_op_nehalem.o

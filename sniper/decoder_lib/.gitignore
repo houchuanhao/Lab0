@@ -1,0 +1,6 @@
+/decoder.d
+/decoder.o
+/libdecoder.a
+/riscv_decoder.d
+/x86_decoder.d
+/x86_decoder.o
