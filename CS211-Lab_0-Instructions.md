@@ -131,9 +131,6 @@ User program ends
 [SNIPER] Elapsed time: 5.14 seconds
 $
 ```
-[ezra]:in order to  use gdb model, I modified the file in my computer: /etc/sysctl.d/10-ptrace.conf
-kernel.yama.ptrace_scope = 0
-(it was 1 before my edition)
 
 Note: <i>Replace [STUDENT-EMAIL-ACCOUNT, function, line number] using your ShanghaiTech account,
 the function you modify, and the line number in the modified file(s) of Sniper, respectively.</i>
