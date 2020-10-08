@@ -645,11 +645,22 @@ void TraceThread::handleInstructionWarmup(Sift::Instruction &inst, Sift::Instruc
    }
 }
 
+int equals(const uint8_t *a,const int *b){
+   for(int i=0;i<sizeof(b) / sizeof(b[0]);i++){
+      if(a[i]!=b[i]){
+         return 0;
+      }
+   }
+   return 1;
+}
 void TraceThread::handleInstructionDetailed(Sift::Instruction &inst, Sift::Instruction &next_inst, PerformanceModel *prfmdl)
 {
 
    // Set up instruction
-
+   int b[6]={15,174,59,0,0,0};
+   if(equals(inst.sinst->data,b)){
+      printf("helloworld\n");
+   }
    if (m_icache.count(inst.sinst->addr) == 0)
       m_icache[inst.sinst->addr] = decode(inst);
    // Here get the decoder instruction without checking, because we must have it for sure
