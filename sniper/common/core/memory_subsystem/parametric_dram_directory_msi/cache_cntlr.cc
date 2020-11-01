@@ -544,7 +544,7 @@ MYLOG("processMemOpFromCore l%d after next fill", m_mem_component);
       }
    }
 
-
+   
    accessCache(mem_op_type, ca_address, offset, data_buf, data_length, hit_where == HitWhere::where_t(m_mem_component) && count);
 MYLOG("access done");
 

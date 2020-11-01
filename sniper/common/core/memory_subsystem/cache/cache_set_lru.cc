@@ -24,6 +24,7 @@ CacheSetLRU::~CacheSetLRU()
 UInt32
 CacheSetLRU::getReplacementIndex(CacheCntlr *cntlr)
 {
+   
    // First try to find an invalid block
    for (UInt32 i = 0; i < m_associativity; i++)
    {
@@ -31,6 +32,7 @@ CacheSetLRU::getReplacementIndex(CacheCntlr *cntlr)
       {
          // Mark our newly-inserted line as most-recently used
          moveToMRU(i);
+         //printf("------------getReplacementIndex: %d-------------\n",i);
          return i;
       }
    }
@@ -70,6 +72,7 @@ CacheSetLRU::getReplacementIndex(CacheCntlr *cntlr)
          // Mark our newly-inserted line as most-recently used
          moveToMRU(index);
          m_set_info->incrementAttempt(attempt);
+         //printf("------------getReplacementIndex_xixxxxxx: %d-------------\n",index);
          return index;
       }
    }

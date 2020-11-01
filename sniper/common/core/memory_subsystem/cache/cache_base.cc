@@ -52,7 +52,8 @@ void
 CacheBase::splitAddress(const IntPtr addr, IntPtr& tag, UInt32& set_index) const
 {
    tag = addr >> m_log_blocksize;
-
+   //addr :11111111010100101001111000010011010000100000000
+   //tag:  11111111010100101001111000010011010000100
    IntPtr linearAddress = m_ahl ? m_ahl->getLinearAddress(addr) : addr;
    IntPtr block_num = linearAddress >> m_log_blocksize;
 

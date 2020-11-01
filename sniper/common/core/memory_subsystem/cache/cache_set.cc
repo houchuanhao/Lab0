@@ -100,7 +100,7 @@ CacheSet::insert(CacheBlockInfo* cache_block_info, Byte* fill_buff, bool* evicti
 {
    // This replacement strategy does not take into account the fact that
    // cache blocks can be voluntarily flushed or invalidated due to another write request
-   const UInt32 index = getReplacementIndex(cntlr);
+   const UInt32 index = getReplacementIndex(cntlr);//块的index
    assert(index < m_associativity);
 
    assert(eviction != NULL);
