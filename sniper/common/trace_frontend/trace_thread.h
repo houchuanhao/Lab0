@@ -8,7 +8,7 @@
 #include "sift_reader.h"
 #include "operand.h"
 #include "semaphore.h"
-
+#include <queue>
 #include <decoder.h>
 
 //extern "C" {
@@ -135,10 +135,10 @@ class TraceThread : public Runnable
 
    public:
       bool m_stopped;
-
       TraceThread(Thread *thread, SubsecondTime time_start, String tracefile, String responsefile, app_id_t app_id, bool cleanup);
       ~TraceThread();
-
+      std::queue<int> icache;
+      std::queue<int> dcache;
       void spawn();
       void stop() { m_stop = true; }
       UInt64 getProgressExpect();

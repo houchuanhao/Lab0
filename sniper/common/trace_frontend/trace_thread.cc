@@ -22,7 +22,7 @@
 
 #include <unistd.h>
 #include <sys/syscall.h>
-
+#include <vector>
 #include <x86_decoder.h>  // TODO remove when the decode function in microop perf model is adapted
 
 //#if PIN_REV >= 67254
@@ -701,10 +701,17 @@ void TraceThread::handleInstructionDetailed(Sift::Instruction &inst, Sift::Instr
    // Push instruction
 
    prfmdl->queueInstruction(dynins);
-
+   /*
+   if(icache.size()<10){
+      // 地址解析
+   }
+   */
    // simulate
 
    prfmdl->iterate();
+}
+void getAccess(){
+
 }
 
 void TraceThread::addDetailedMemoryInfo(DynamicInstruction *dynins, Sift::Instruction &inst, const dl::DecodedInst &decoded_inst, uint32_t mem_idx, Operand::Direction op_type, bool is_prefetch, PerformanceModel *prfmdl)
@@ -903,6 +910,7 @@ UInt64 TraceThread::getProgressValue()
 
 void TraceThread::handleAccessMemory(Core::lock_signal_t lock_signal, Core::mem_op_t mem_op_type, IntPtr d_addr, char* data_buffer, UInt32 data_size)
 {
+   printf("handleAccessMemory \n");
    Sift::MemoryLockType sift_lock_signal;
    Sift::MemoryOpType sift_mem_op;
 

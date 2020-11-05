@@ -148,7 +148,7 @@ void Cache::insertSingleLine(IntPtr addr, Byte *fill_buff,
 #endif
 
    delete cache_block_info;
-   printf("%s: insert_tag: %lx ,evict_tag: %lx ,set_index: %d \n",m_name.c_str(),tag,evict_block_info->getTag(),set_index);
+   printf("%s:addr:%lx  insert_tag: %lx ,evict_tag: %lx ,set_index: %d \n",m_name.c_str(),addr,tag,evict_block_info->getTag(),set_index);
 }
 
 // Single line cache access at addr

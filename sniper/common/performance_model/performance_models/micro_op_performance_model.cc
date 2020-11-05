@@ -150,6 +150,92 @@ void MicroOpPerformanceModel::doSquashing(std::vector<DynamicMicroOp*> &current_
    }
 }
 
+
+void MicroOpPerformanceModel::preHandleInstruction(DynamicInstruction *dynins){
+     ComponentPeriod insn_period = *(const_cast<ComponentPeriod*>(static_cast<const ComponentPeriod*>(m_elapsed_time)));
+   std::vector<DynamicMicroOp*> current_uops;
+
+   // These vectors are local to handleInstruction, but keeping them around as member variables
+   // saves a lot on allocation/deallocation time.
+   m_current_uops.clear();
+   m_cache_lines_read.clear();
+   m_cache_lines_written.clear();
+
+   UInt64 num_reads_done = 0;
+   UInt64 num_writes_done = 0;
+   UInt64 num_nonmem_done = 0;
+
+   if (dynins->instruction->getMicroOps())
+   {
+      for(std::vector<const MicroOp*>::const_iterator it = dynins->instruction->getMicroOps()->begin(); it != dynins->instruction->getMicroOps()->end(); it++)
+      {
+         m_current_uops.push_back(m_core_model->createDynamicMicroOp(m_allocator, *it, insn_period));
+      }
+   }
+
+   // Find some information
+   size_t num_loads = 0;
+   size_t num_stores = 0;
+   size_t exec_base_index = SIZE_MAX;
+   // Find the first load
+   size_t load_base_index = SIZE_MAX;
+   // Find the first store
+   size_t store_base_index = SIZE_MAX;
+   for (size_t m = 0 ; m < m_current_uops.size() ; m++ )
+   {
+      if (m_current_uops[m]->getMicroOp()->isExecute())
+      {
+         exec_base_index = m;
+      }
+      if (m_current_uops[m]->getMicroOp()->isStore())
+      {
+         ++num_stores;
+         if (store_base_index == SIZE_MAX)
+            store_base_index = m;
+      }
+      if (m_current_uops[m]->getMicroOp()->isLoad())
+      {
+         ++num_loads;
+         if (load_base_index == SIZE_MAX)
+            load_base_index = m;
+      }
+
+   }
+
+   //-------------------------
+   //begin
+   IntPtr icache_address;
+   std::list<IntPtr> dcacheLst;
+   icache_address=(IntPtr)~0;
+   // Compute the iCache cost, and add to our cycle time
+   if (Sim()->getConfig()->getEnableICacheModeling())
+   {
+      // Sometimes, these aren't real instructions (INST_SPAWN, etc), and therefore, we need to skip these
+      if (dynins->instruction->getAddress() && !dynins->instruction->isPseudo() && m_current_uops.size() > 0 )
+      {
+         //printf("instructionMemory----- %lx \n",dynins->eip);
+         MemoryResult memres = getCore()->readInstructionMemory(dynins->eip, dynins->instruction->getSize());
+         icache_address=getCore()->getAddress(dynins->eip, dynins->instruction->getSize());
+         printf("read OK \n");
+         // For the interval model, for now, use integers for the cycle latencies
+         UInt64 memory_cycle_latency = SubsecondTime::divideRounded(memres.latency, insn_period);
+
+         // Set the hit_where information for the icache
+         // The interval model will only add icache latencies if there hasn't been a hit.
+         m_current_uops[0]->setICacheHitWhere(memres.hit_where);
+         m_current_uops[0]->setICacheLatency(memory_cycle_latency);
+      }
+   }
+
+   bool do_squashing = false;
+   // Graphite instruction operands
+   const OperandList &ops = dynins->instruction->getOperands();
+   unsigned int memidx = 0;
+
+   if (m_issue_memops){
+      dynins->accessMemory(getCore());
+   }
+}
 void MicroOpPerformanceModel::handleInstruction(DynamicInstruction *dynins)
 {
    ComponentPeriod insn_period = *(const_cast<ComponentPeriod*>(static_cast<const ComponentPeriod*>(m_elapsed_time)));
@@ -207,8 +293,9 @@ void MicroOpPerformanceModel::handleInstruction(DynamicInstruction *dynins)
       // Sometimes, these aren't real instructions (INST_SPAWN, etc), and therefore, we need to skip these
       if (dynins->instruction->getAddress() && !dynins->instruction->isPseudo() && m_current_uops.size() > 0 )
       {
+         //printf("instructionMemory----- %lx \n",dynins->eip);
          MemoryResult memres = getCore()->readInstructionMemory(dynins->eip, dynins->instruction->getSize());
-
+         printf("read OK \n");
          // For the interval model, for now, use integers for the cycle latencies
          UInt64 memory_cycle_latency = SubsecondTime::divideRounded(memres.latency, insn_period);
 
@@ -224,9 +311,9 @@ void MicroOpPerformanceModel::handleInstruction(DynamicInstruction *dynins)
    const OperandList &ops = dynins->instruction->getOperands();
    unsigned int memidx = 0;
 
-   if (m_issue_memops)
+   if (m_issue_memops){
       dynins->accessMemory(getCore());
-
+   }
    // If we haven't gotten all of our read or write data yet, iterate over the operands
    for (size_t i = 0 ; i < ops.size() ; ++i)
    {
@@ -236,6 +323,7 @@ void MicroOpPerformanceModel::handleInstruction(DynamicInstruction *dynins)
       {
          LOG_ASSERT_ERROR(dynins->num_memory > memidx, "Did not get enough memory_info objects");
          DynamicInstruction::MemoryInfo &info = dynins->memory_info[memidx++];
+         //printf("dcache info.address %lx \n",info.addr);
          LOG_ASSERT_ERROR(info.dir == o.m_direction,
                           "Expected memory %d info, got: %d.", o.m_direction, info.dir);
 

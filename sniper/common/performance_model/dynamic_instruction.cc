@@ -4,7 +4,7 @@
 #include "core.h"
 #include "branch_predictor.h"
 #include "performance_model.h"
-
+#include "memory_manager_base.h"
 Allocator* DynamicInstruction::createAllocator()
 {
    return new TypedAllocator<DynamicInstruction, 1024>();
@@ -43,8 +43,11 @@ void DynamicInstruction::accessMemory(Core *core)
 {
    for(UInt8 idx = 0; idx < num_memory; ++idx)
    {
+      
       if (memory_info[idx].executed && memory_info[idx].hit_where == HitWhere::UNKNOWN)
       {
+         UInt32 cache_block_size = core->getMemoryManager()->getCacheBlockSize();
+         printf("L1D ....   %lx \n",memory_info[idx].addr-memory_info[idx].addr%cache_block_size);
          MemoryResult res = core->accessMemory(
             /*instruction.isAtomic()
                ? (info->type == DynamicInstructionInfo::MEMORY_READ ? Core::LOCK : Core::UNLOCK)

@@ -8,7 +8,6 @@
 #include "micro_op.h"
 #include "hit_where.h"
 #include "allocator.h"
-
 class CoreModel;
 
 class DynamicMicroOp

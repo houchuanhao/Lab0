@@ -305,8 +305,9 @@ void PerformanceModel::iterate()
 
       LOG_ASSERT_ERROR(!ins->instruction->isIdle(), "Idle instructions should not make it here!");
 
-      if (!m_fastforward && m_enabled)
+      if (!m_fastforward && m_enabled){
          handleInstruction(ins);
+      }
 
       delete ins;
 

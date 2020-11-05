@@ -7,7 +7,7 @@
 #include "stats.h"
 #include "subsecond_time.h"
 #include "dynamic_micro_op.h"
-
+#include <list>
 #define DEBUG_INSN_LOG 0
 #define DEBUG_DYN_INSN_LOG 0
 #define DEBUG_CYCLE_COUNT_LOG 0
@@ -30,7 +30,7 @@ protected:
 
 private:
    void handleInstruction(DynamicInstruction *instruction);
-
+   void MicroOpPerformanceModel::preHandleInstruction(DynamicInstruction *dynins);
    static MicroOp* m_serialize_uop;
    static MicroOp* m_mfence_uop;
    static MicroOp* m_memaccess_uop;
