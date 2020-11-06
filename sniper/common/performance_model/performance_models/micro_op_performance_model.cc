@@ -247,10 +247,8 @@ void MicroOpPerformanceModel::handleInstruction(DynamicInstruction *dynins)
    UInt64 num_reads_done = 0;
    UInt64 num_writes_done = 0;
    UInt64 num_nonmem_done = 0;
-   printf("444\n");
    if (dynins->instruction->getMicroOps())
    {
-      printf("555\n");
       for(std::vector<const MicroOp*>::const_iterator it = dynins->instruction->getMicroOps()->begin(); it != dynins->instruction->getMicroOps()->end(); it++)
       {
          m_current_uops.push_back(m_core_model->createDynamicMicroOp(m_allocator, *it, insn_period));
@@ -265,7 +263,6 @@ void MicroOpPerformanceModel::handleInstruction(DynamicInstruction *dynins)
    size_t load_base_index = SIZE_MAX;
    // Find the first store
    size_t store_base_index = SIZE_MAX;
-   printf("333\n");
    for (size_t m = 0 ; m < m_current_uops.size() ; m++ )
    {
       if (m_current_uops[m]->getMicroOp()->isExecute())
@@ -286,14 +283,12 @@ void MicroOpPerformanceModel::handleInstruction(DynamicInstruction *dynins)
       }
 
    }
-   printf("222\n");
    // Compute the iCache cost, and add to our cycle time
    if (Sim()->getConfig()->getEnableICacheModeling())
    {
       // Sometimes, these aren't real instructions (INST_SPAWN, etc), and therefore, we need to skip these
       if (dynins->instruction->getAddress() && !dynins->instruction->isPseudo() && m_current_uops.size() > 0 )
       {
-         printf("111\n");
          //printf("instructionMemory----- %lx \n",dynins->eip);
          MemoryResult memres = getCore()->readInstructionMemory(dynins->eip, dynins->instruction->getSize());
          printf("read OK \n");

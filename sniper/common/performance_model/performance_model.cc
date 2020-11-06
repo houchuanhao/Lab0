@@ -320,13 +320,13 @@ void PerformanceModel::preIterate(){
    }
    // no need to syn
    // synchronize();
-   printf("iadd %lx \n",iadd);
+   printf("指令cache iadd %lx \n",iadd);
     //遍历方法2 此种方法对于std模板类通用
    std::list<IntPtr>::iterator it;
    for(it=dlst.begin();it!=dlst.end();it++)
    {
        IntPtr p = *it;
-       printf("dadd %lx \n",p);
+       printf("数据cache dadd %lx \n",p);
    }
       
 }
