@@ -11,7 +11,7 @@ public:
 
 private:
    void handleInstruction(DynamicInstruction *instruction);
-
+   void preHandleInstruction(DynamicInstruction *instruction,std::list<IntPtr>&  dcacheLst,IntPtr &icacheAdd);
    bool isModeled(Instruction const* instruction) const;
 
    UInt64 m_latency_cutoff;

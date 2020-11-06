@@ -40,7 +40,9 @@ void CoreThread::run()
                          (void *)&cont);
 
    PerformanceModel *prfmdl = Sim()->getCoreManager()->getCurrentCore()->getPerformanceModel();
+   
    while (cont) {
+      printf("33333333 \n");
       prfmdl->iterate();
       usleep(1000); // Reduce system load while there's nothing to do (outside ROI)
    }

@@ -460,6 +460,7 @@ Sift::Mode TraceThread::handleInstructionCountFunc(uint32_t icount)
       // We're in detailed mode, but our SIFT recorder doesn't know it yet
       // Do something to advance time
       core->getPerformanceModel()->queuePseudoInstruction(new UnknownInstruction(icount * core->getDvfsDomain()->getPeriod()));
+      printf("1111111111111111\n");
       core->getPerformanceModel()->iterate();
    }
 
@@ -701,14 +702,17 @@ void TraceThread::handleInstructionDetailed(Sift::Instruction &inst, Sift::Instr
    // Push instruction
 
    prfmdl->queueInstruction(dynins);
-   /*
+   printf("preInterate ~ begin \n");
+   prfmdl->preIterate();
+   printf("preInterate ~ end \n");
    if(icache.size()<10){
       // 地址解析
+      //prfmdl->
    }
-   */
    // simulate
-
+   printf("real Interate ~ begin \n");
    prfmdl->iterate();
+   printf("real Interate ~ end \n");
 }
 void getAccess(){
 

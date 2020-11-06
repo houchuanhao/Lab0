@@ -49,6 +49,7 @@ void InstructionModeling::handleBasicBlock(THREADID thread_id)
    }
 
 #ifndef ENABLE_PERF_MODEL_OWN_THREAD
+   printf("222222222222222222\n");
    prfmdl->iterate();
    SubsecondTime time = prfmdl->getElapsedTime();
    if (thread->reschedule(time, core))

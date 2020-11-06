@@ -30,7 +30,8 @@ protected:
 
 private:
    void handleInstruction(DynamicInstruction *instruction);
-   void MicroOpPerformanceModel::preHandleInstruction(DynamicInstruction *dynins);
+   void preHandleInstruction(DynamicInstruction *instruction,std::list<IntPtr> & dcacheLst,IntPtr &icacheAdd);
+//   void preHandleInstruction(DynamicInstruction *dynins);
    static MicroOp* m_serialize_uop;
    static MicroOp* m_mfence_uop;
    static MicroOp* m_memaccess_uop;

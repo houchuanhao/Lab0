@@ -184,7 +184,9 @@ RobContention* CoreModelNehalem::createRobContentionModel(const Core *core) cons
 
 DynamicMicroOp* CoreModelNehalem::createDynamicMicroOp(Allocator *alloc, const MicroOp *uop, ComponentPeriod period) const
 {
+   printf("alloc begin \n");
    DynamicMicroOpNehalem *info = DynamicMicroOp::alloc<DynamicMicroOpNehalem>(alloc, uop, this, period);
+   printf("alloc)OK \n");
    info->uop_port = DynamicMicroOpNehalem::getPort(uop);
    info->uop_bypass = DynamicMicroOpNehalem::getBypassType(uop);
    info->uop_alu = DynamicMicroOpNehalem::getAlu(uop);

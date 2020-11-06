@@ -5,7 +5,7 @@
 #include "subsecond_time.h"
 #include "hit_where.h"
 #include "allocator.h"
-
+#include <list>
 class Core;
 class Instruction;
 
@@ -83,6 +83,7 @@ class DynamicInstruction
 
       SubsecondTime getBranchCost(Core *core, bool *p_is_mispredict = NULL);
       void accessMemory(Core *core);
+      std::list<IntPtr> preAccessMemory(Core* core);
 };
 
 #endif // __DYNAMIC_INSTRUCTION_H

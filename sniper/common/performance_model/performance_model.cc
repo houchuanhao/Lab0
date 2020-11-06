@@ -13,6 +13,7 @@
 #include "dvfs_manager.h"
 #include "instruction_tracer.h"
 #include "dynamic_instruction.h"
+#include <list>
 
 PerformanceModel* PerformanceModel::create(Core* core)
 {
@@ -290,9 +291,48 @@ void PerformanceModel::handleIdleInstruction(PseudoInstruction *instruction)
    if (m_fastforward)
       m_fastforward_model->notifyElapsedTimeUpdate();
 }
+void PerformanceModel::preIterate(){
+   IntPtr iadd=(IntPtr)~0;
+   //preHandleInstruction()
+   std::list<IntPtr> dlst;
+   // While the functional thread is waiting because of clock skew minimization, wait here as well
+   if (m_instruction_queue.size() > 0)
+   {
+      #ifdef ENABLE_PERF_MODEL_OWN_THREAD
+      while(m_hold)
+         sched_yield();
+      #endif
 
+      DynamicInstruction *ins = m_instruction_queue.front();
+
+
+      LOG_ASSERT_ERROR(!ins->instruction->isIdle(), "Idle instructions should not make it here!");
+
+      if (!m_fastforward && m_enabled){
+
+         preHandleInstruction(ins,dlst,iadd);
+         printf("preHandleInstruction OK\n");
+      }
+
+      //delete ins;
+
+      //m_instruction_queue.pop();
+   }
+   // no need to syn
+   // synchronize();
+   printf("iadd %lx \n",iadd);
+    //遍历方法2 此种方法对于std模板类通用
+   std::list<IntPtr>::iterator it;
+   for(it=dlst.begin();it!=dlst.end();it++)
+   {
+       IntPtr p = *it;
+       printf("dadd %lx \n",p);
+   }
+      
+}
 void PerformanceModel::iterate()
 {
+   printf("m_instruction_queue.size(): %d \n",m_instruction_queue.size());
    while (m_instruction_queue.size() > 0)
    {
       // While the functional thread is waiting because of clock skew minimization, wait here as well
@@ -306,7 +346,9 @@ void PerformanceModel::iterate()
       LOG_ASSERT_ERROR(!ins->instruction->isIdle(), "Idle instructions should not make it here!");
 
       if (!m_fastforward && m_enabled){
+         printf("before handleInstruction\n");
          handleInstruction(ins);
+         printf("after handleInstruction\n");
       }
 
       delete ins;

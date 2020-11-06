@@ -10,6 +10,7 @@
 #include "hit_where.h"
 
 #include <queue>
+#include <list>
 #include <iostream>
 
 // Forward Decls
@@ -31,6 +32,7 @@ public:
    void queuePseudoInstruction(PseudoInstruction *i);
    void handleIdleInstruction(PseudoInstruction *i);
    void iterate();
+   void preIterate();
    virtual void synchronize();
 
    UInt64 getInstructionCount() const { return m_instruction_count; }
@@ -103,7 +105,7 @@ private:
 
    // Simulate a single instruction
    virtual void handleInstruction(DynamicInstruction *instruction) = 0;
-
+   virtual void preHandleInstruction(DynamicInstruction *instruction,std::list<IntPtr>&  dcacheLst,IntPtr &icacheAdd) =0;
    // When time is jumped ahead outside of control of the performance model (synchronization instructions, etc.)
    // notify it here. This may be used to synchronize internal time or to flush various instruction queues
    virtual void notifyElapsedTimeUpdate() {}

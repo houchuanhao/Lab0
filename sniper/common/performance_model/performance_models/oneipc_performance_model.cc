@@ -35,9 +35,12 @@ OneIPCPerformanceModel::OneIPCPerformanceModel(Core *core)
 OneIPCPerformanceModel::~OneIPCPerformanceModel()
 {
 }
-
+void OneIPCPerformanceModel::preHandleInstruction(DynamicInstruction *instruction,std::list<IntPtr>&  dcacheLst,IntPtr &icacheAdd){
+   printf("hhhhhhhhhhw1\n");
+}
 void OneIPCPerformanceModel::handleInstruction(DynamicInstruction *dynins)
 {
+   printf("hhhhhhhhhhw2\n");
    // compute cost
    ComponentTime cost = m_elapsed_time.getLatencyGenerator();
    SubsecondTime *cpiComponent = NULL;

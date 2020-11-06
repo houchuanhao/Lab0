@@ -242,8 +242,8 @@ Core::getAddress(IntPtr address, UInt32 instruction_size){
    {
       if (single_cache_line)
       {
-         printf("instructionMemory-----address&blockmask %lx   address%lx m_icache_last_block%lx\n",(address & blockmask),address,m_icache_last_block);
-         printf("not access L1I \n");
+         printf("pre_instructionMemory-----address&blockmask %lx   address%lx m_icache_last_block%lx\n",(address & blockmask),address,m_icache_last_block);
+         printf("not preaccess L1I \n");
          return ((IntPtr)~0);
          //return makeMemoryResult(HitWhere::L1I, getMemoryManager()->getL1HitLatency());
       }
@@ -251,16 +251,16 @@ Core::getAddress(IntPtr address, UInt32 instruction_size){
       {
          // Instruction spanning cache lines: drop the first line, do access the second one
          address = (address & blockmask) + getMemoryManager()->getCacheBlockSize();
-         printf("instructionMemory-----address&blockmask %lx   address%lx m_icache_last_block%lx\n",(address & blockmask),address,m_icache_last_block);
+         printf("pre_instructionMemory-----address&blockmask %lx   address%lx m_icache_last_block%lx\n",(address & blockmask),address,m_icache_last_block);
          printf("spanning cache lines \n");
       }
    }else{
-      printf("instructionMemory-----address&blockmask %lx   address%lx m_icache_last_block%lx\n",(address & blockmask),address,m_icache_last_block);
+      printf("pre_instructionMemory-----address&blockmask %lx   address%lx m_icache_last_block%lx\n",(address & blockmask),address,m_icache_last_block);
    }
 
    // Update the most recent cache line accessed
-   m_icache_last_block = address & blockmask;
-   printf("do access L1I \n");
+   //m_icache_last_block = address & blockmask;
+   printf("do preAccess L1I \n");
    // Cases with multiple cache lines or when we are not sure that it will be a hit call into the caches
   /* return initiateMemoryAccess(MemComponent::L1_ICACHE,
              Core::NONE, Core::READ, address & blockmask, NULL, getMemoryManager()->getCacheBlockSize(), MEM_MODELED_COUNT_TLBTIME, 0, SubsecondTime::MaxTime());
@@ -272,7 +272,7 @@ Core::getAddress(IntPtr address, UInt32 instruction_size){
 MemoryResult
 Core::readInstructionMemory(IntPtr address, UInt32 instruction_size)
 {
-   LOG_PRINT("Instruction: Address(0x%x), Size(%u), Start READ",
+   printf("Instruction: Address(0x%x), Size(%u), Start READ\n",
            address, instruction_size);
    UInt64 blockmask = ~(getMemoryManager()->getCacheBlockSize() - 1);
    bool single_cache_line = ((address & blockmask) == ((address + instruction_size - 1) & blockmask));

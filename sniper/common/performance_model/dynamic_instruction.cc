@@ -38,7 +38,22 @@ SubsecondTime DynamicInstruction::getBranchCost(Core *core, bool *p_is_mispredic
 
    return static_cast<SubsecondTime>(*period) * cost;
 }
-
+std::list<IntPtr> DynamicInstruction::preAccessMemory(Core *core)
+{
+   std::list<IntPtr> addressList;
+   for(UInt8 idx = 0; idx < num_memory; ++idx)
+   {
+      
+      if (memory_info[idx].executed && memory_info[idx].hit_where == HitWhere::UNKNOWN)
+      {
+         UInt32 cache_block_size = core->getMemoryManager()->getCacheBlockSize();
+         //printf("L1D ....   %lx \n",memory_info[idx].addr-memory_info[idx].addr%cache_block_size);
+         addressList.push_front(memory_info[idx].addr-memory_info[idx].addr%cache_block_size);
+      }
+   }
+   printf("preAccessMemory!!!\n");
+   return addressList;
+}
 void DynamicInstruction::accessMemory(Core *core)
 {
    for(UInt8 idx = 0; idx < num_memory; ++idx)
