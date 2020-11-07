@@ -6,9 +6,11 @@
 #include "logmem.h"
 #include "exceptions.h"
 #include "sim_api.h"
+#include "Singleton.h"
 
 int main(int argc, char* argv[])
 {
+   Singleton::getInstance()->cleanOptOut();
    // Set thread name for Sniper-in-Sniper simulations
    SimSetThreadName("main");
 

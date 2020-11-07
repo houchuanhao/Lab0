@@ -2,6 +2,7 @@
 #include <array>
 Singleton * Singleton::local_instance = NULL;
 Singleton::Singleton(){
+    
     optFIle.open(optfilePathIn);
     char line[100];
     int sum=0;
@@ -15,20 +16,20 @@ Singleton::Singleton(){
             // 按行读入，如果读单词用 in>>value;
         }
     }
-    
-    futureList.pop_back();
-    
-    /*
     itor=futureList.begin();
-    list<String>::iterator itor;
-    while (itor!=futureList.end())
+    futureList.pop_back();
+    /*
+    list<String>::iterator itor1;
+    itor1=futureList.begin();
+    while (itor1!=futureList.end())
     {
-        getAddr(*itor);
-        cout<<*itor++<<endl;
+        getAddr(*itor1);
+        cout<<"   name:"<<getName(*itor1)<<endl;
+        cout<<*itor1++<<endl;
     }
-    */
+*/
     optFIle.close();
-    printf("read OK sum: %d \n",futureList.size());
+    printf("read Infile OK sum: %ld \n",futureList.size());
 }
 IntPtr Singleton::getAddr(String str){
     IntPtr inp;
@@ -38,7 +39,12 @@ IntPtr Singleton::getAddr(String str){
     inp = strtoul(str.c_str(), &ptr, 10);
     return inp;
 }
-
+String Singleton::getName(String str){
+    IntPtr inp;
+    int pos=str.find(' ');  
+    String substr=str.substr(0,pos);
+    return substr;
+}
 
 Singleton *Singleton::getInstance()
 {
@@ -47,4 +53,13 @@ Singleton *Singleton::getInstance()
         local_instance = new Singleton();
     }
     return local_instance;
+}
+void Singleton::cleanOptOut(){
+    optOutpt.open(optfilePathOut,ios::out);
+    //optOutpt<<"0 0"<<endl;
+    printf("clean optout\n");
+    optOutpt.close();
+}
+void Singleton::optOutWrite(String str){
+
 }

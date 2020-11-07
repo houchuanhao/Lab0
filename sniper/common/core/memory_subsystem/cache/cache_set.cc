@@ -7,6 +7,7 @@
 #include "cache_set_random.h"
 #include "cache_set_round_robin.h"
 #include "cache_set_srrip.h"
+#include "cache_set_opt.h"
 #include "cache_base.h"
 #include "log.h"
 #include "simulator.h"
@@ -146,7 +147,8 @@ CacheSet::createCacheSet(String cfgname, core_id_t core_id,
       case CacheBase::LRU:
       case CacheBase::LRU_QBS:
          return new CacheSetLRU(cache_type, associativity, blocksize, dynamic_cast<CacheSetInfoLRU*>(set_info), getNumQBSAttempts(policy, cfgname, core_id));
-
+      case CacheBase::OPT:
+         return new CacheSetOPT(cache_type, associativity, blocksize, dynamic_cast<CacheSetInfoOPT*>(set_info), getNumQBSAttempts(policy, cfgname, core_id));
       case CacheBase::NRU:
          return new CacheSetNRU(cache_type, associativity, blocksize);
 
@@ -186,6 +188,8 @@ CacheSet::createCacheSetInfo(String name, String cfgname, core_id_t core_id, Str
       case CacheBase::SRRIP:
       case CacheBase::SRRIP_QBS:
          return new CacheSetInfoLRU(name, cfgname, core_id, associativity, getNumQBSAttempts(policy, cfgname, core_id));
+      case CacheBase::OPT:
+          return new CacheSetInfoOPT(name, cfgname, core_id, associativity, getNumQBSAttempts(policy, cfgname, core_id));
       default:
          return NULL;
    }
@@ -211,6 +215,8 @@ CacheSet::parsePolicyType(String policy)
       return CacheBase::ROUND_ROBIN;
    if (policy == "lru")
       return CacheBase::LRU;
+   if (policy == "opt")
+      return CacheBase::OPT;
    if (policy == "lru_qbs")
       return CacheBase::LRU_QBS;
    if (policy == "nru")

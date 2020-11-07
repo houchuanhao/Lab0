@@ -52,6 +52,7 @@ class CacheBase
       {
          ROUND_ROBIN = 0,
          LRU,
+         OPT,
          LRU_QBS,
          NRU,
          MRU,

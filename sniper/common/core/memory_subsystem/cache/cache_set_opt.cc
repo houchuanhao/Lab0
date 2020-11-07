@@ -1,30 +1,29 @@
-#include "cache_set_lru.h"
+#include "cache_set_opt.h"
 #include "log.h"
 #include "stats.h"
-#include "Singleton.h"
-// Implements LRU replacement, optionally augmented with Query-Based Selection [Jaleel et al., MICRO'10]
 
-CacheSetLRU::CacheSetLRU(
+// Implements OPT replacement, optionally augmented with Query-Based Selection [Jaleel et al., MICRO'10]
+
+CacheSetOPT::CacheSetOPT(
       CacheBase::cache_t cache_type,
-      UInt32 associativity, UInt32 blocksize, CacheSetInfoLRU* set_info, UInt8 num_attempts)
+      UInt32 associativity, UInt32 blocksize, CacheSetInfoOPT* set_info, UInt8 num_attempts)
    : CacheSet(cache_type, associativity, blocksize)
    , m_num_attempts(num_attempts)
    , m_set_info(set_info)
 {
-
-   printf("lru cache_type: %d associativity %x ,blocksize %x ***************LRU\n",cache_type,associativity,blocksize);
-   m_lru_bits = new UInt8[m_associativity];
+   printf("opt cache_type: %d associativity %x ,blocksize %x ***************LRU\n",cache_type,associativity,blocksize);
+   m_opt_bits = new UInt8[m_associativity];
    for (UInt32 i = 0; i < m_associativity; i++)
-      m_lru_bits[i] = i;
+      m_opt_bits[i] = i;
 }
 
-CacheSetLRU::~CacheSetLRU()
+CacheSetOPT::~CacheSetOPT()
 {
-   delete [] m_lru_bits;
+   delete [] m_opt_bits;
 }
 
 UInt32
-CacheSetLRU::getReplacementIndex(CacheCntlr *cntlr)
+CacheSetOPT::getReplacementIndex(CacheCntlr *cntlr)
 {
    
    // First try to find an invalid block
@@ -39,20 +38,20 @@ CacheSetLRU::getReplacementIndex(CacheCntlr *cntlr)
       }
    }
 
-   // Make m_num_attemps attempts at evicting the block at LRU position
+   // Make m_num_attemps attempts at evicting the block at OPT position
    for(UInt8 attempt = 0; attempt < m_num_attempts; ++attempt)
    {
       UInt32 index = 0;
       UInt8 max_bits = 0;
       for (UInt32 i = 0; i < m_associativity; i++)
       {
-         if (m_lru_bits[i] > max_bits && isValidReplacement(i))
+         if (m_opt_bits[i] > max_bits && isValidReplacement(i))
          {
             index = i;
-            max_bits = m_lru_bits[i];
+            max_bits = m_opt_bits[i];
          }
       }
-      LOG_ASSERT_ERROR(index < m_associativity, "Error Finding LRU bits");
+      LOG_ASSERT_ERROR(index < m_associativity, "Error Finding OPT bits");
 
       bool qbs_reject = false;
       if (attempt < m_num_attempts - 1)
@@ -83,24 +82,24 @@ CacheSetLRU::getReplacementIndex(CacheCntlr *cntlr)
 }
 
 void
-CacheSetLRU::updateReplacementIndex(UInt32 accessed_index)
+CacheSetOPT::updateReplacementIndex(UInt32 accessed_index)
 {
-   m_set_info->increment(m_lru_bits[accessed_index]);
+   m_set_info->increment(m_opt_bits[accessed_index]);
    moveToMRU(accessed_index);
 }
 
 void
-CacheSetLRU::moveToMRU(UInt32 accessed_index)
+CacheSetOPT::moveToMRU(UInt32 accessed_index)
 {
    for (UInt32 i = 0; i < m_associativity; i++)
    {
-      if (m_lru_bits[i] < m_lru_bits[accessed_index])
-         m_lru_bits[i] ++;
+      if (m_opt_bits[i] < m_opt_bits[accessed_index])
+         m_opt_bits[i] ++;
    }
-   m_lru_bits[accessed_index] = 0;
+   m_opt_bits[accessed_index] = 0;
 }
 
-CacheSetInfoLRU::CacheSetInfoLRU(String name, String cfgname, core_id_t core_id, UInt32 associativity, UInt8 num_attempts)
+CacheSetInfoOPT::CacheSetInfoOPT(String name, String cfgname, core_id_t core_id, UInt32 associativity, UInt8 num_attempts)
    : m_associativity(associativity)
    , m_attempts(NULL)
 {
@@ -122,7 +121,7 @@ CacheSetInfoLRU::CacheSetInfoLRU(String name, String cfgname, core_id_t core_id,
    }
 };
 
-CacheSetInfoLRU::~CacheSetInfoLRU()
+CacheSetInfoOPT::~CacheSetInfoOPT()
 {
    delete [] m_access;
    if (m_attempts)
