@@ -7,6 +7,7 @@
 #include "cache.h"
 #include <string>
 #include <array>
+#include <map>
 using namespace std;
 class AccessAdd
 {
@@ -22,13 +23,15 @@ private:
     list<String> futureList;
     static Singleton *local_instance;
     Singleton();
-
 public:
+    map<String,Cache*> cacheMap;
     void cleanOptOut();
     void optOutWrite(String str);
     static Singleton *getInstance();
     static String getName(String str);
     static IntPtr getAddr(String);
-   
+    void next();
+    String getValue();
+    list<String>::iterator getItor();
 };
 #endif /* CACHE_SET_LRU_H */

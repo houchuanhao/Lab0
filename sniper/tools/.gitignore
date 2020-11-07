@@ -6,3 +6,5 @@
 /sniper_lib.pyc
 /sniper_stats.pyc
 /sniper_stats_sqlite.pyc
+*.pyc
+*.gitignore

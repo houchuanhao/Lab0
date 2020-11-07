@@ -26,7 +26,7 @@ CacheSetLRU::~CacheSetLRU()
 UInt32
 CacheSetLRU::getReplacementIndex(CacheCntlr *cntlr)
 {
-   
+   printf("lru replectment \n");
    // First try to find an invalid block
    for (UInt32 i = 0; i < m_associativity; i++)
    {

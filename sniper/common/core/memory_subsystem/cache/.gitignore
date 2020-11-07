@@ -26,3 +26,6 @@
 /pr_l2_cache_block_info.o
 /shared_cache_block_info.d
 /shared_cache_block_info.o
+*.d
+*.o
+*.gitignore

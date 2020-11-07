@@ -18,16 +18,24 @@ Singleton::Singleton(){
     }
     itor=futureList.begin();
     futureList.pop_back();
-    /*
+    
     list<String>::iterator itor1;
+
+
+
+   /*
     itor1=futureList.begin();
+     list<String>::iterator itor2=itor1;
     while (itor1!=futureList.end())
     {
-        getAddr(*itor1);
-        cout<<"   name:"<<getName(*itor1)<<endl;
+        //getAddr(*itor1);
+        cout<<"   itor1name:"<<getName(*itor1)<<endl;
+        cout<<"   itor2name:"<<getName(*itor2)<<endl;
         cout<<*itor1++<<endl;
     }
 */
+
+
     optFIle.close();
     printf("read Infile OK sum: %ld \n",futureList.size());
 }
@@ -60,6 +68,20 @@ void Singleton::cleanOptOut(){
     printf("clean optout\n");
     optOutpt.close();
 }
+void Singleton::next(){
+    itor++;
+}
+String Singleton::getValue(){
+    return *itor;
+}
+list<String>::iterator Singleton::getItor(){
+    //itor->
+    list<String>::iterator  p=itor;
+    return p;
+}
+
+
+
 void Singleton::optOutWrite(String str){
 
 }

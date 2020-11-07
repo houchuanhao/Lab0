@@ -29,8 +29,9 @@ class CacheSetInfoOPT : public CacheSetInfo
 class CacheSetOPT : public CacheSet
 {
    public:
+      CacheBase *cache;
       CacheSetOPT(CacheBase::cache_t cache_type,
-            UInt32 associativity, UInt32 blocksize, CacheSetInfoOPT* set_info, UInt8 num_attempts);
+            UInt32 associativity, UInt32 blocksize, CacheSetInfoOPT* set_info, UInt8 num_attempts,CacheBase * bcache);
       virtual ~CacheSetOPT();
 
       virtual UInt32 getReplacementIndex(CacheCntlr *cntlr);

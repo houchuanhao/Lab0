@@ -1,7 +1,10 @@
 #include "simulator.h"
 #include "cache.h"
 #include "log.h"
-
+#include "Singleton.h"
+#include <map>
+#include <string>
+//#include
 // Cache class
 // constructors/destructors
 Cache::Cache(
@@ -28,7 +31,7 @@ Cache::Cache(
    m_sets = new CacheSet *[m_num_sets];
    for (UInt32 i = 0; i < m_num_sets; i++)
    {
-      m_sets[i] = CacheSet::createCacheSet(cfgname, core_id, replacement_policy, m_cache_type, m_associativity, m_blocksize, m_set_info);
+      m_sets[i] = CacheSet::createCacheSet(cfgname, core_id, replacement_policy, m_cache_type, m_associativity, m_blocksize, m_set_info,this);
    }
 
 #ifdef ENABLE_SET_USAGE_HIST
@@ -36,6 +39,7 @@ Cache::Cache(
    for (UInt32 i = 0; i < m_num_sets; i++)
       m_set_usage_hist[i] = 0;
 #endif
+   Singleton::getInstance()->cacheMap.insert(std::pair<String, Cache*>(name,this));  
 }
 
 Cache::~Cache()
@@ -91,14 +95,14 @@ Cache::accessSingleLine(IntPtr addr, access_t access_type,
    UInt32 block_offset;
 
    splitAddress(addr, tag, set_index, block_offset);
-   if(set_index>128){
-      printf("------set_index %x \n",set_index);
-   }
+   printf("%s ------set_index %x \n",getName().c_str(), set_index);
    CacheSet *set = m_sets[set_index];
    CacheBlockInfo *cache_block_info = set->find(tag, &line_index);
 
-   if (cache_block_info == NULL)
+   if (cache_block_info == NULL){
+      printf("%s error!!!\n",getName().c_str());
       return NULL;
+   }
 
    if (access_type == LOAD)
    {

@@ -21,6 +21,7 @@ class CacheBlockInfo
    // This can be extended later to include other information
    // for different cache coherence protocols
    private:
+      int future;
       IntPtr m_tag;
       CacheState::cstate_t m_cstate;
       UInt64 m_owner;

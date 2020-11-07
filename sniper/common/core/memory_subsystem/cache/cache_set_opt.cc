@@ -1,17 +1,19 @@
 #include "cache_set_opt.h"
 #include "log.h"
 #include "stats.h"
-
+#include "Singleton.h"
 // Implements OPT replacement, optionally augmented with Query-Based Selection [Jaleel et al., MICRO'10]
 
 CacheSetOPT::CacheSetOPT(
       CacheBase::cache_t cache_type,
-      UInt32 associativity, UInt32 blocksize, CacheSetInfoOPT* set_info, UInt8 num_attempts)
+      UInt32 associativity, UInt32 blocksize, CacheSetInfoOPT* set_info, UInt8 num_attempts,CacheBase * bcache)
    : CacheSet(cache_type, associativity, blocksize)
    , m_num_attempts(num_attempts)
    , m_set_info(set_info)
 {
-   printf("opt cache_type: %d associativity %x ,blocksize %x ***************LRU\n",cache_type,associativity,blocksize);
+   cache=bcache;
+   printf("cacheName %s \n",bcache->getName().c_str());
+   //printf("opt cache_type: %d associativity %x ,blocksize %x ***************LRU\n",cache_type,associativity,blocksize);
    m_opt_bits = new UInt8[m_associativity];
    for (UInt32 i = 0; i < m_associativity; i++)
       m_opt_bits[i] = i;
@@ -21,11 +23,16 @@ CacheSetOPT::~CacheSetOPT()
 {
    delete [] m_opt_bits;
 }
-
 UInt32
 CacheSetOPT::getReplacementIndex(CacheCntlr *cntlr)
 {
-   
+   Singleton *single=Singleton::getInstance();
+   IntPtr currentAddr=Singleton::getAddr(single->getValue());
+   printf("currentAddr:%lx \n",currentAddr);
+
+   IntPtr tag;
+   UInt32 set_index;
+   cache->splitAddress(currentAddr, tag, set_index);
    // First try to find an invalid block
    for (UInt32 i = 0; i < m_associativity; i++)
    {

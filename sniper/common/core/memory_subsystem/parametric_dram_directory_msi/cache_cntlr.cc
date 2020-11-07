@@ -11,7 +11,7 @@
 #include "shmem_perf.h"
 #include <cstring>
 #include <fstream>
-
+#include <Singleton.h>
 // Define to allow private L2 caches not to take the stack lock.
 // Works in most cases, but seems to have some more bugs or race conditions, preventing it from being ready for prime time.
 //#define PRIVATE_L2_OPTIMIZATION
@@ -168,6 +168,7 @@ CacheCntlr::CacheCntlr(MemComponent::component_t mem_component,
    {
       /* Master cache */
       m_master = new CacheMasterCntlr(name, core_id, cache_params.outstanding_misses);
+     printf("cache_cntrl new cache: %s\n",name);
       m_master->m_cache = new Cache(name,
             "perf_model/" + cache_params.configName,
             m_core_id,
@@ -552,16 +553,20 @@ MYLOG("processMemOpFromCore l%d after next fill", m_mem_component);
          m_next_cache_cntlr->updateUsageBits(ca_address, cache_block_info->getUsage());
       }
    }
-   
+   printf("accessCache %s  mem_op_type %d,ca_address+offset %lx,offset lx \n",m_master->m_cache->getName().c_str(),mem_op_type,ca_address+offset);
+   accessCache(mem_op_type, ca_address, offset, data_buf, data_length, hit_where == HitWhere::where_t(m_mem_component) && count);
+   printf("accessCache OK \n");
+
    std::fstream file;
    String fname=optfilePathOut;
    file.open(/*"/home/ezra/Desktop/Lab0/opt1.txt"*/fname.c_str(),std::ios::app);
-   file<<m_master->m_cache->getName().c_str()<<" "<<ca_address<<std::endl;
+   file<<m_master->m_cache->getName().c_str()<<" "<<ca_address+offset<<std::endl;
    file.close();
-   printf("accessCache %s  mem_op_type %d,ca_address %lx,offset %lx \n",m_master->m_cache->getName().c_str(),mem_op_type,ca_address,offset);
-   accessCache(mem_op_type, ca_address, offset, data_buf, data_length, hit_where == HitWhere::where_t(m_mem_component) && count);
-MYLOG("access done");
+   
 
+   Singleton::getInstance()->next();
+   MYLOG("access done");
+  
 
    SubsecondTime t_now = getShmemPerfModel()->getElapsedTime(ShmemPerfModel::_USER_THREAD);
    SubsecondTime total_latency = t_now - t_start;
