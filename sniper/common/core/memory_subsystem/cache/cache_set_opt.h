@@ -2,6 +2,7 @@
 #define CACHE_SET_OPT_H
 
 #include "cache_set.h"
+#include <list>
 
 class CacheSetInfoOPT : public CacheSetInfo
 {
@@ -30,14 +31,17 @@ class CacheSetOPT : public CacheSet
 {
    public:
       CacheBase *cache;
+      int caIndex;
+      std::list<IntPtr> getFutureAddr();
       CacheSetOPT(CacheBase::cache_t cache_type,
-            UInt32 associativity, UInt32 blocksize, CacheSetInfoOPT* set_info, UInt8 num_attempts,CacheBase * bcache);
+            UInt32 associativity, UInt32 blocksize, CacheSetInfoOPT* set_info, UInt8 num_attempts,CacheBase * bcache,int cacheIndex);
       virtual ~CacheSetOPT();
 
       virtual UInt32 getReplacementIndex(CacheCntlr *cntlr);
       void updateReplacementIndex(UInt32 accessed_index);
 
    protected:
+      
       const UInt8 m_num_attempts;
       UInt8* m_opt_bits;
       CacheSetInfoOPT* m_set_info;

@@ -99,6 +99,7 @@ CacheSet::invalidate(IntPtr& tag)
 void
 CacheSet::insert(CacheBlockInfo* cache_block_info, Byte* fill_buff, bool* eviction, CacheBlockInfo* evict_block_info, Byte* evict_buff, CacheCntlr *cntlr)
 {
+   printf("tag: %lx \n",cache_block_info->getTag());
    // This replacement strategy does not take into account the fact that
    // cache blocks can be voluntarily flushed or invalidated due to another write request
    const UInt32 index = getReplacementIndex(cntlr);//块的index
@@ -136,7 +137,7 @@ CacheSet*
 CacheSet::createCacheSet(String cfgname, core_id_t core_id,
       String replacement_policy,
       CacheBase::cache_t cache_type,
-      UInt32 associativity, UInt32 blocksize, CacheSetInfo* set_info,CacheBase * cache)
+      UInt32 associativity, UInt32 blocksize, CacheSetInfo* set_info,CacheBase * cache,int cacheIndex)
 {
    CacheBase::ReplacementPolicy policy = parsePolicyType(replacement_policy);
    switch(policy)
@@ -148,7 +149,7 @@ CacheSet::createCacheSet(String cfgname, core_id_t core_id,
       case CacheBase::LRU_QBS:
          return new CacheSetLRU(cache_type, associativity, blocksize, dynamic_cast<CacheSetInfoLRU*>(set_info), getNumQBSAttempts(policy, cfgname, core_id));
       case CacheBase::OPT:
-         return new CacheSetOPT(cache_type, associativity, blocksize, dynamic_cast<CacheSetInfoOPT*>(set_info), getNumQBSAttempts(policy, cfgname, core_id),cache);
+         return new CacheSetOPT(cache_type, associativity, blocksize, dynamic_cast<CacheSetInfoOPT*>(set_info), getNumQBSAttempts(policy, cfgname, core_id),cache,cacheIndex);
       case CacheBase::NRU:
          return new CacheSetNRU(cache_type, associativity, blocksize);
 

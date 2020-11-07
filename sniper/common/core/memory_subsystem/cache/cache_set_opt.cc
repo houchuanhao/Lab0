@@ -3,14 +3,17 @@
 #include "stats.h"
 #include "Singleton.h"
 // Implements OPT replacement, optionally augmented with Query-Based Selection [Jaleel et al., MICRO'10]
+list<IntPtr> CacheSetOPT::getFutureAddr(){
 
+}
 CacheSetOPT::CacheSetOPT(
       CacheBase::cache_t cache_type,
-      UInt32 associativity, UInt32 blocksize, CacheSetInfoOPT* set_info, UInt8 num_attempts,CacheBase * bcache)
+      UInt32 associativity, UInt32 blocksize, CacheSetInfoOPT* set_info, UInt8 num_attempts,CacheBase * bcache,int cacheIndex)
    : CacheSet(cache_type, associativity, blocksize)
    , m_num_attempts(num_attempts)
    , m_set_info(set_info)
 {
+   caIndex=caIndex;
    cache=bcache;
    printf("cacheName %s \n",bcache->getName().c_str());
    //printf("opt cache_type: %d associativity %x ,blocksize %x ***************LRU\n",cache_type,associativity,blocksize);
@@ -28,16 +31,20 @@ CacheSetOPT::getReplacementIndex(CacheCntlr *cntlr)
 {
    Singleton *single=Singleton::getInstance();
    IntPtr currentAddr=Singleton::getAddr(single->getValue());
-   printf("currentAddr:%lx \n",currentAddr);
 
    IntPtr tag;
    UInt32 set_index;
    cache->splitAddress(currentAddr, tag, set_index);
+
+    printf("currentAddr:%lx currentTag %lx,current_SetIndex \n",currentAddr,tag,set_index);
+
+
    // First try to find an invalid block
    for (UInt32 i = 0; i < m_associativity; i++)
    {
       if (!m_cache_block_info_array[i]->isValid())
       {
+         
          // Mark our newly-inserted line as most-recently used
          moveToMRU(i);
          //printf("------------getReplacementIndex: %d-------------\n",i);

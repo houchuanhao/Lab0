@@ -31,7 +31,7 @@ Cache::Cache(
    m_sets = new CacheSet *[m_num_sets];
    for (UInt32 i = 0; i < m_num_sets; i++)
    {
-      m_sets[i] = CacheSet::createCacheSet(cfgname, core_id, replacement_policy, m_cache_type, m_associativity, m_blocksize, m_set_info,this);
+      m_sets[i] = CacheSet::createCacheSet(cfgname, core_id, replacement_policy, m_cache_type, m_associativity, m_blocksize, m_set_info,this,i);
    }
 
 #ifdef ENABLE_SET_USAGE_HIST
