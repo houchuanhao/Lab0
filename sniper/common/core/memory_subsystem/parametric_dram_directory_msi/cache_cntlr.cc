@@ -9,8 +9,8 @@
 #include "hooks_manager.h"
 #include "cache_atd.h"
 #include "shmem_perf.h"
-
 #include <cstring>
+#include <fstream>
 
 // Define to allow private L2 caches not to take the stack lock.
 // Works in most cases, but seems to have some more bugs or race conditions, preventing it from being ready for prime time.
@@ -155,6 +155,7 @@ CacheCntlr::CacheCntlr(MemComponent::component_t mem_component,
    m_shmem_perf_global(NULL),
    m_shmem_perf_model(shmem_perf_model)
 {
+
    m_core_id_master = m_core_id - m_core_id % m_shared_cores;
    Sim()->getStatsManager()->logTopology(name, core_id, m_core_id_master);
 
@@ -270,10 +271,15 @@ CacheCntlr::CacheCntlr(MemComponent::component_t mem_component,
       registerStatsMetric(name, core_id, "uncore-totaltime", &m_shmem_perf_totaltime);
       registerStatsMetric(name, core_id, "uncore-requests", &m_shmem_perf_numrequests);
    }
+
+
 }
 
 CacheCntlr::~CacheCntlr()
 {
+   // if(file.is_open()){
+   //    file.close();
+   // }
    if (isMasterCache())
    {
       delete m_master;
@@ -322,6 +328,7 @@ CacheCntlr::processMemOpFromCore(
       bool modeled,
       bool count)
 {
+   printf("processMemOpFromCore %s  mem_op_type %d,ca_address %lx,offset %lx \n",m_master->m_cache->getName().c_str(),mem_op_type,ca_address,offset);
    HitWhere::where_t hit_where = HitWhere::MISS;
 
    // Protect against concurrent access from sibling SMT threads
@@ -388,6 +395,7 @@ LOG_ASSERT_ERROR(offset + data_length <= getCacheBlockSize(), "access until %u >
 
    if (cache_hit)
    {
+      printf("L1 hit \n");
 MYLOG("L1 hit");
       getMemoryManager()->incrElapsedTime(m_mem_component, CachePerfModel::ACCESS_CACHE_DATA_AND_TAGS, ShmemPerfModel::_USER_THREAD);
       hit_where = (HitWhere::where_t)m_mem_component;
@@ -439,6 +447,7 @@ MYLOG("L1 hit");
    } else {
       /* cache miss: either wrong coherency state or not present in the cache */
 MYLOG("L1 miss");
+printf("L1 miss \n");
       if (!m_passthrough)
          getMemoryManager()->incrElapsedTime(m_mem_component, CachePerfModel::ACCESS_CACHE_TAGS, ShmemPerfModel::_USER_THREAD);
 
@@ -543,8 +552,13 @@ MYLOG("processMemOpFromCore l%d after next fill", m_mem_component);
          m_next_cache_cntlr->updateUsageBits(ca_address, cache_block_info->getUsage());
       }
    }
-
    
+   std::fstream file;
+   String fname=optfilePathOut;
+   file.open(/*"/home/ezra/Desktop/Lab0/opt1.txt"*/fname.c_str(),std::ios::app);
+   file<<m_master->m_cache->getName().c_str()<<" "<<ca_address<<std::endl;
+   file.close();
+   printf("accessCache %s  mem_op_type %d,ca_address %lx,offset %lx \n",m_master->m_cache->getName().c_str(),mem_op_type,ca_address,offset);
    accessCache(mem_op_type, ca_address, offset, data_buf, data_length, hit_where == HitWhere::where_t(m_mem_component) && count);
 MYLOG("access done");
 

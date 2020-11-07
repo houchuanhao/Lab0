@@ -1,7 +1,7 @@
 #include "cache_set_lru.h"
 #include "log.h"
 #include "stats.h"
-
+#include "Singleton.h"
 // Implements LRU replacement, optionally augmented with Query-Based Selection [Jaleel et al., MICRO'10]
 
 CacheSetLRU::CacheSetLRU(
@@ -11,6 +11,9 @@ CacheSetLRU::CacheSetLRU(
    , m_num_attempts(num_attempts)
    , m_set_info(set_info)
 {
+
+   printf("cache_type: %d associativity %x ,blocksize %x ***************LRU\n",cache_type,associativity,blocksize);
+   Singleton::getInstance();
    m_lru_bits = new UInt8[m_associativity];
    for (UInt32 i = 0; i < m_associativity; i++)
       m_lru_bits[i] = i;

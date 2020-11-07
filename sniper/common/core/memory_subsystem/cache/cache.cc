@@ -23,6 +23,7 @@ Cache::Cache(
       m_cache_type(cache_type),
       m_fault_injector(fault_injector)
 {
+   printf("create_Cache %s num_sets %d \n",name.c_str(),num_sets);
    m_set_info = CacheSet::createCacheSetInfo(name, cfgname, core_id, replacement_policy, m_associativity);
    m_sets = new CacheSet *[m_num_sets];
    for (UInt32 i = 0; i < m_num_sets; i++)
@@ -90,7 +91,9 @@ Cache::accessSingleLine(IntPtr addr, access_t access_type,
    UInt32 block_offset;
 
    splitAddress(addr, tag, set_index, block_offset);
-
+   if(set_index>128){
+      printf("------set_index %x \n",set_index);
+   }
    CacheSet *set = m_sets[set_index];
    CacheBlockInfo *cache_block_info = set->find(tag, &line_index);
 
@@ -148,7 +151,7 @@ void Cache::insertSingleLine(IntPtr addr, Byte *fill_buff,
 #endif
 
    delete cache_block_info;
-   printf("%s: insert_tag: %lx ,evict_tag: %lx ,set_index: %d \n",m_name.c_str(),tag,evict_block_info->getTag(),set_index);
+   printf("%s:address: %lx, insert_tag: %lx ,evict_tag: %lx ,set_index: %d \n",m_name.c_str(),addr,tag,evict_block_info->getTag(),set_index);
 }
 
 // Single line cache access at addr

@@ -25,12 +25,14 @@ void clflush(char *data, int len) {
 }
 
 int main(int argc, char *argv[]) {
+	printf("helloworld\n");
+	return 0;
 	char *src = NULL, *dst = NULL;
 	int i = 0;
 	fprintf(stdout, "User program begins\n");
 	assert(posix_memalign((void **)&src, CACHE_LINE_SIZE, STR_LENGTH) == 0);
 	assert(posix_memalign((void **)&dst, CACHE_LINE_SIZE, STR_LENGTH) == 0);
-	for (; i < STR_LENGTH; ++i)
+	for (; i < STR_LENGTH; i=i+2)
 		src[i] = 0x41 + i % 26;
 
 	memcpy(dst, src, STR_LENGTH);
