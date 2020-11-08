@@ -3,7 +3,8 @@
 
 #include "cache_set.h"
 #include <list>
-
+#define ahead 50
+#define unknown INT32_MAX
 class CacheSetInfoOPT : public CacheSetInfo
 {
    public:
@@ -31,8 +32,9 @@ class CacheSetOPT : public CacheSet
 {
    public:
       CacheBase *cache;
-      int caIndex;
-      std::list<IntPtr> getFutureAddr();
+      int setIndex;
+      std::list<IntPtr> initFutureTag();
+      void updateFutureTage();
       CacheSetOPT(CacheBase::cache_t cache_type,
             UInt32 associativity, UInt32 blocksize, CacheSetInfoOPT* set_info, UInt8 num_attempts,CacheBase * bcache,int cacheIndex);
       virtual ~CacheSetOPT();
@@ -43,7 +45,7 @@ class CacheSetOPT : public CacheSet
    protected:
       
       const UInt8 m_num_attempts;
-      UInt8* m_opt_bits;
+      int* m_opt_bits;
       CacheSetInfoOPT* m_set_info;
       void moveToMRU(UInt32 accessed_index);
 };

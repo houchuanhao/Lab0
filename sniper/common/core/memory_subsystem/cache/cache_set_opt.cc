@@ -2,10 +2,61 @@
 #include "log.h"
 #include "stats.h"
 #include "Singleton.h"
-// Implements OPT replacement, optionally augmented with Query-Based Selection [Jaleel et al., MICRO'10]
-list<IntPtr> CacheSetOPT::getFutureAddr(){
 
+// Implements OPT replacement, optionally augmented with Query-Based Selection [Jaleel et al., MICRO'10]
+list<IntPtr> CacheSetOPT::initFutureTag(){// 替换前从now开始
+   Singleton *single=Singleton::getInstance();
+   list<String>::iterator itor=single->getItor();
+   int sum=0;
+   for(int j=1;j<=ahead&&itor!=single->getEnd();itor++){
+      int current=single->getPos();
+      String addrStr=*itor;
+      IntPtr addr=Singleton::getAddr(addrStr);
+      IntPtr tag;
+      UInt32 set_index;
+      cache->splitAddress(addr, tag, set_index);
+      if (setIndex==set_index){
+         j++;
+         for (UInt32 i = 0; i < m_associativity; i++){
+            if(m_cache_block_info_array[i]->isValid()){ 
+               if(m_cache_block_info_array[i]->getTag()==tag){
+                  if(m_opt_bits[i]!=unknown&&m_opt_bits[i]<single->getPos()){
+                     m_opt_bits[i]=current+j;
+                  }
+               }
+
+            }
+         }
+      }
+   }
 }
+void CacheSetOPT::updateFutureTage(){
+   Singleton *single=Singleton::getInstance();
+   list<String>::iterator itor=single->getItor();
+   for(int j=1;j<=ahead&&itor!=single->getEnd();itor++){
+      int current=single->getPos();
+      String addrStr=*itor;
+      IntPtr addr=Singleton::getAddr(addrStr);
+      IntPtr tag;
+      UInt32 set_index;
+      cache->splitAddress(addr, tag, set_index);
+      if (setIndex==set_index){
+         j++;
+         if(j==ahead){
+            for (UInt32 i = 0; i < m_associativity; i++){
+               if(m_cache_block_info_array[i]->isValid()){ 
+                  if(m_cache_block_info_array[i]->getTag()==tag){
+                     if(m_opt_bits[i]!=unknown&&m_opt_bits[i]<single->getPos()){
+                        m_opt_bits[i]=current+j;
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
 CacheSetOPT::CacheSetOPT(
       CacheBase::cache_t cache_type,
       UInt32 associativity, UInt32 blocksize, CacheSetInfoOPT* set_info, UInt8 num_attempts,CacheBase * bcache,int cacheIndex)
@@ -13,13 +64,14 @@ CacheSetOPT::CacheSetOPT(
    , m_num_attempts(num_attempts)
    , m_set_info(set_info)
 {
-   caIndex=caIndex;
+   setIndex=cacheIndex;
    cache=bcache;
-   printf("cacheName %s \n",bcache->getName().c_str());
+   printf("set cacheName %s num_attempts %d \n",bcache->getName().c_str(),num_attempts);
    //printf("opt cache_type: %d associativity %x ,blocksize %x ***************LRU\n",cache_type,associativity,blocksize);
-   m_opt_bits = new UInt8[m_associativity];
-   for (UInt32 i = 0; i < m_associativity; i++)
+   m_opt_bits = new int[m_associativity];
+   for (int i = 0; i < m_associativity; i++)
       m_opt_bits[i] = i;
+   //initFutureTag();
 }
 
 CacheSetOPT::~CacheSetOPT()
@@ -28,7 +80,14 @@ CacheSetOPT::~CacheSetOPT()
 }
 UInt32
 CacheSetOPT::getReplacementIndex(CacheCntlr *cntlr)
-{
+{  
+
+   // 更新最后一个
+
+   //updateFutureTage();
+   //for()
+
+
    Singleton *single=Singleton::getInstance();
    IntPtr currentAddr=Singleton::getAddr(single->getValue());
 
@@ -47,12 +106,14 @@ CacheSetOPT::getReplacementIndex(CacheCntlr *cntlr)
          
          // Mark our newly-inserted line as most-recently used
          moveToMRU(i);
+         // 还没有被用过，可直接返回，且不需要移除
          //printf("------------getReplacementIndex: %d-------------\n",i);
          return i;
       }
    }
 
    // Make m_num_attemps attempts at evicting the block at OPT position
+   // inclusive/noclusive,LRU不用考虑
    for(UInt8 attempt = 0; attempt < m_num_attempts; ++attempt)
    {
       UInt32 index = 0;
@@ -98,6 +159,7 @@ CacheSetOPT::getReplacementIndex(CacheCntlr *cntlr)
 void
 CacheSetOPT::updateReplacementIndex(UInt32 accessed_index)
 {
+   // 在这里执行lookahead
    m_set_info->increment(m_opt_bits[accessed_index]);
    moveToMRU(accessed_index);
 }

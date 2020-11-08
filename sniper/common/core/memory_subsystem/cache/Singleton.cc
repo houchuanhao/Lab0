@@ -70,6 +70,7 @@ void Singleton::cleanOptOut(){
 }
 void Singleton::next(){
     itor++;
+    now++;
 }
 String Singleton::getValue(){
     return *itor;
@@ -79,8 +80,13 @@ list<String>::iterator Singleton::getItor(){
     list<String>::iterator  p=itor;
     return p;
 }
-
-
+list<String>::iterator Singleton::getEnd(){
+    //itor->
+    return futureList.end();
+}
+int Singleton::getPos(){
+    return now;
+}
 
 void Singleton::optOutWrite(String str){
 

@@ -88,7 +88,7 @@ Cache::accessSingleLine(IntPtr addr, access_t access_type,
                         Byte *buff, UInt32 bytes, SubsecondTime now, bool update_replacement)
 {
    //assert((buff == NULL) == (bytes == 0));
-
+   printf("update_replacement: %d\n",update_replacement);
    IntPtr tag;
    UInt32 set_index;
    UInt32 line_index = -1;
@@ -110,10 +110,12 @@ Cache::accessSingleLine(IntPtr addr, access_t access_type,
       if (m_fault_injector)
          m_fault_injector->preRead(addr, set_index * m_associativity + line_index, bytes, (Byte *)m_sets[set_index]->getDataPtr(line_index, block_offset), now);
 
+      //printf("lod update_replacement %d \n",update_replacement);
       set->read_line(line_index, block_offset, buff, bytes, update_replacement);
    }
    else
    {
+      //printf("store update_replacement %d \n",update_replacement);
       set->write_line(line_index, block_offset, buff, bytes, update_replacement);
 
       // NOTE: assumes error occurs in memory. If we want to model bus errors, insert the error into buff instead

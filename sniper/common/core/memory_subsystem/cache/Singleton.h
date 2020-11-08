@@ -23,6 +23,7 @@ private:
     list<String> futureList;
     static Singleton *local_instance;
     Singleton();
+    int now=1;
 public:
     map<String,Cache*> cacheMap;
     void cleanOptOut();
@@ -33,5 +34,7 @@ public:
     void next();
     String getValue();
     list<String>::iterator getItor();
+    list<String>::iterator getEnd();
+    int getPos();
 };
 #endif /* CACHE_SET_LRU_H */
