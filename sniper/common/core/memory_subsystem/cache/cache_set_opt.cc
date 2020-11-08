@@ -8,13 +8,21 @@ list<IntPtr> CacheSetOPT::initFutureTag(){// 替换前从now开始
    Singleton *single=Singleton::getInstance();
    list<String>::iterator itor=single->getItor();
    int sum=0;
-   for(int j=1;j<=ahead&&itor!=single->getEnd();itor++){
+   printf("11111 setindex %d\n",setIndex);
+   for(int j=1;j<=50;j++){
+      printf(" j:%d  \n",j);
+      if(itor==single->getEnd()){
+         printf("end\n");
+         break;
+      }
+      sum++;
       int current=single->getPos();
       String addrStr=*itor;
       IntPtr addr=Singleton::getAddr(addrStr);
       IntPtr tag;
       UInt32 set_index;
       cache->splitAddress(addr, tag, set_index);
+      printf("got set_index %d \n",set_index);
       if (setIndex==set_index){
          j++;
          for (UInt32 i = 0; i < m_associativity; i++){
@@ -28,7 +36,10 @@ list<IntPtr> CacheSetOPT::initFutureTag(){// 替换前从now开始
             }
          }
       }
+      itor++;
    }
+   list<IntPtr> p;
+   return p;
 }
 void CacheSetOPT::updateFutureTage(){
    Singleton *single=Singleton::getInstance();
@@ -54,7 +65,9 @@ void CacheSetOPT::updateFutureTage(){
             }
          }
       }
+      //printf("%d updatej\n",j);
    }
+   printf("UPDATE OK \n");
 }
 
 CacheSetOPT::CacheSetOPT(
@@ -69,9 +82,12 @@ CacheSetOPT::CacheSetOPT(
    printf("set cacheName %s num_attempts %d \n",bcache->getName().c_str(),num_attempts);
    //printf("opt cache_type: %d associativity %x ,blocksize %x ***************LRU\n",cache_type,associativity,blocksize);
    m_opt_bits = new int[m_associativity];
+   printf("m_opt_bits\n");
    for (int i = 0; i < m_associativity; i++)
       m_opt_bits[i] = i;
-   //initFutureTag();
+   printf("begin initTag \n");
+   initFutureTag();
+   printf("cacheSet aaaaaaaaaaaa\n");
 }
 
 CacheSetOPT::~CacheSetOPT()
@@ -83,9 +99,36 @@ CacheSetOPT::getReplacementIndex(CacheCntlr *cntlr)
 {  
 
    // 更新最后一个
+   int maxpos=0;
+   int maxvalue=0;
+   updateFutureTage();
+   for (UInt32 i = 0; i < m_associativity; i++)
+   {
 
-   //updateFutureTage();
-   //for()
+      if (!m_cache_block_info_array[i]->isValid())
+      {
+         
+         // Mark our newly-inserted line as most-recently used
+         //moveToMRU(i);
+         // 还没有被用过，可直接返回，且不需要移除
+         //printf("------------getReplacementIndex: %d-------------\n",i);
+         return i;
+      }
+
+
+      if(m_opt_bits[i]==unknown){
+         return i;
+      }
+
+      if(m_opt_bits[i]>maxvalue){
+         maxpos=i;
+         maxvalue=m_opt_bits[i];
+      }
+
+   }
+   return maxpos;
+
+
 
 
    Singleton *single=Singleton::getInstance();
@@ -159,6 +202,7 @@ CacheSetOPT::getReplacementIndex(CacheCntlr *cntlr)
 void
 CacheSetOPT::updateReplacementIndex(UInt32 accessed_index)
 {
+   return;
    // 在这里执行lookahead
    m_set_info->increment(m_opt_bits[accessed_index]);
    moveToMRU(accessed_index);
