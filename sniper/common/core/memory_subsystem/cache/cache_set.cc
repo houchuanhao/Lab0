@@ -90,16 +90,29 @@ CacheSet::invalidate(IntPtr& tag)
       if (m_cache_block_info_array[index]->getTag() == tag)
       {
          m_cache_block_info_array[index]->invalidate();
+         printf("invalid.... \n");
          return true;
       }
    }
+   return false;
+}
+bool 
+CacheSet::isIncache(IntPtr& tag){
+      for (SInt32 index = m_associativity-1; index >= 0; index--)
+   {
+      if (m_cache_block_info_array[index]->getTag() == tag)
+      {
+        return m_cache_block_info_array[index]->isValid();
+      }
+   }
+   //printf("match faild\n");
    return false;
 }
 
 void
 CacheSet::insert(CacheBlockInfo* cache_block_info, Byte* fill_buff, bool* eviction, CacheBlockInfo* evict_block_info, Byte* evict_buff, CacheCntlr *cntlr)
 {
-   printf("tag: %lx \n",cache_block_info->getTag());
+   //printf("tag: %lx \n",cache_block_info->getTag());
    // This replacement strategy does not take into account the fact that
    // cache blocks can be voluntarily flushed or invalidated due to another write request
    const UInt32 index = getReplacementIndex(cntlr);//块的index

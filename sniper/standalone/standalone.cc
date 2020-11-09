@@ -58,9 +58,8 @@ int main(int argc, char* argv[])
      Sim()->getTraceManager()->init();
      Sim()->getTraceManager()->run();
    }
-
    Simulator::release();
    delete cfg;
-
+   Singleton::getInstance()->showHit();
    return 0;
 }

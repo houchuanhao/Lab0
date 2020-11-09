@@ -26,7 +26,7 @@ class CacheSet
       static CacheBase::ReplacementPolicy parsePolicyType(String policy);
       static UInt8 getNumQBSAttempts(CacheBase::ReplacementPolicy, String cfgname, core_id_t core_id);
 
-   protected:
+   public:
       CacheBlockInfo** m_cache_block_info_array; // 记录所有blocks的信息
       char* m_blocks;// 头指针，内容记录所有blocks的内容
       UInt32 m_associativity;// 多少个组
@@ -38,7 +38,7 @@ class CacheSet
       CacheSet(CacheBase::cache_t cache_type,
             UInt32 associativity, UInt32 blocksize);
       virtual ~CacheSet();
-
+      bool isIncache(IntPtr& tag);
       UInt32 getBlockSize() { return m_blocksize; }
       UInt32 getAssociativity() { return m_associativity; }
       Lock& getLock() { return m_lock; }

@@ -2,7 +2,6 @@
 #include <array>
 Singleton * Singleton::local_instance = NULL;
 Singleton::Singleton(){
-    
     optFIle.open(optfilePathIn);
     char line[100];
     int sum=0;
@@ -90,4 +89,7 @@ int Singleton::getPos(){
 
 void Singleton::optOutWrite(String str){
 
+}
+void Singleton::showHit(){
+    printf("L1hit %d,L1miss %d,L2hit% d,L2miss %d\n",L1hit,L1miss,L2hit,L2miss);
 }

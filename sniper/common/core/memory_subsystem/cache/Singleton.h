@@ -25,6 +25,10 @@ private:
     Singleton();
     int now=1;
 public:
+    int L1hit=0;
+    int L1miss=0;
+    int L2hit=0;
+    int L2miss=0;
     map<String,Cache*> cacheMap;
     void cleanOptOut();
     void optOutWrite(String str);
@@ -36,5 +40,6 @@ public:
     list<String>::iterator getItor();
     list<String>::iterator getEnd();
     int getPos();
+    void showHit();
 };
 #endif /* CACHE_SET_LRU_H */

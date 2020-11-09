@@ -168,7 +168,7 @@ CacheCntlr::CacheCntlr(MemComponent::component_t mem_component,
    {
       /* Master cache */
       m_master = new CacheMasterCntlr(name, core_id, cache_params.outstanding_misses);
-     printf("cache_cntrl new cache: %s\n",name);
+     //printf("cache_cntrl new cache: %s\n",name);
       m_master->m_cache = new Cache(name,
             "perf_model/" + cache_params.configName,
             m_core_id,
@@ -329,7 +329,11 @@ CacheCntlr::processMemOpFromCore(
       bool modeled,
       bool count)
 {
-   printf("processMemOpFromCore %s  mem_op_type %d,ca_address %lx,offset %lx \n",m_master->m_cache->getName().c_str(),mem_op_type,ca_address,offset);
+      IntPtr tag;
+   UInt32 set_index;
+   m_master->m_cache->splitAddress(ca_address, tag, set_index);
+   printf("accessCache Begin  ca_address :%lx tag: %lx  set_index %d  \n",ca_address,tag,set_index);
+   //printf("processMemOpFromCore %s  mem_op_type %d,ca_address %lx,offset %lx \n",m_master->m_cache->getName().c_str(),mem_op_type,ca_address,offset);
    HitWhere::where_t hit_where = HitWhere::MISS;
 
    // Protect against concurrent access from sibling SMT threads
@@ -396,7 +400,9 @@ LOG_ASSERT_ERROR(offset + data_length <= getCacheBlockSize(), "access until %u >
 
    if (cache_hit)
    {
-      printf("L1 hit \n");
+      Singleton::getInstance()->L1hit++;
+   printf("L1 hit \n");
+
 MYLOG("L1 hit");
       getMemoryManager()->incrElapsedTime(m_mem_component, CachePerfModel::ACCESS_CACHE_DATA_AND_TAGS, ShmemPerfModel::_USER_THREAD);
       hit_where = (HitWhere::where_t)m_mem_component;
@@ -448,7 +454,8 @@ MYLOG("L1 hit");
    } else {
       /* cache miss: either wrong coherency state or not present in the cache */
 MYLOG("L1 miss");
-printf("L1 miss \n");
+      printf("L1 miss \n");
+      Singleton::getInstance()->L1miss++;
       if (!m_passthrough)
          getMemoryManager()->incrElapsedTime(m_mem_component, CachePerfModel::ACCESS_CACHE_TAGS, ShmemPerfModel::_USER_THREAD);
 
@@ -486,8 +493,15 @@ MYLOG("processMemOpFromCore l%d before next", m_mem_component);
 MYLOG("processMemOpFromCore l%d next hit = %d", m_mem_component, next_cache_hit);
 
       if (next_cache_hit) {
-
+         if(m_next_cache_cntlr->getCache()->getName()=="L2"){
+            Singleton::getInstance()->L2hit++;
+         }
+         printf("%s_ hit\n",m_next_cache_cntlr->getCache()->getName().c_str());
       } else {
+         printf("%s_ miss\n",m_next_cache_cntlr->getCache()->getName().c_str());
+            if(m_next_cache_cntlr->getCache()->getName()=="L2"){
+            Singleton::getInstance()->L2miss++;
+          }
          /* last level miss, a message has been sent. */
 
 MYLOG("processMemOpFromCore l%d waiting for sent message", m_mem_component);
@@ -553,9 +567,9 @@ MYLOG("processMemOpFromCore l%d after next fill", m_mem_component);
          m_next_cache_cntlr->updateUsageBits(ca_address, cache_block_info->getUsage());
       }
    }
-   printf("accessCache %s  mem_op_type %d,ca_address+offset %lx,offset lx \n",m_master->m_cache->getName().c_str(),mem_op_type,ca_address+offset);
+   //printf("accessCache %s  mem_op_type %d,ca_address+offset %lx,offset lx \n",m_master->m_cache->getName().c_str(),mem_op_type,ca_address+offset);
    accessCache(mem_op_type, ca_address, offset, data_buf, data_length, hit_where == HitWhere::where_t(m_mem_component) && count);
-   printf("accessCache OK \n");
+   printf("accessCache done \n");
 
    std::fstream file;
    String fname=optfilePathOut;
@@ -857,6 +871,7 @@ CacheCntlr::processShmemReqFromPrevCache(CacheCntlr* requester, Core::mem_op_t m
 
       if (mem_op_type != Core::READ) // write that hits
       {
+         //printf("xxxx 666\n");
          /* Invalidate/flush in previous levels */
          SubsecondTime latency = SubsecondTime::Zero();
          for(CacheCntlrList::iterator it = m_master->m_prev_cache_cntlrs.begin(); it != m_master->m_prev_cache_cntlrs.end(); it++)
@@ -877,6 +892,7 @@ CacheCntlr::processShmemReqFromPrevCache(CacheCntlr* requester, Core::mem_op_t m
       }
       else if (cache_block_info->getCState() == CacheState::MODIFIED) // reading MODIFIED data
       {
+         //printf("xxxx 555\n");
          MYLOG("reading MODIFIED data");
          /* Writeback in previous levels */
          SubsecondTime latency = SubsecondTime::Zero();
@@ -893,6 +909,7 @@ CacheCntlr::processShmemReqFromPrevCache(CacheCntlr* requester, Core::mem_op_t m
       }
       else if (cache_block_info->getCState() == CacheState::EXCLUSIVE) // reading EXCLUSIVE data
       {
+         //printf("xxxx 444\n");
          MYLOG("reading EXCLUSIVE data");
          // will have shared state
          SubsecondTime latency = SubsecondTime::Zero();
@@ -921,6 +938,7 @@ CacheCntlr::processShmemReqFromPrevCache(CacheCntlr* requester, Core::mem_op_t m
    }
    else // !cache_hit: either data is not here, or operation on data is not permitted
    {
+      //printf("xxxx 333\n");
       // Increment shared mem perf model cycle counts
       if (modeled)
          getMemoryManager()->incrElapsedTime(m_mem_component, CachePerfModel::ACCESS_CACHE_TAGS, ShmemPerfModel::_USER_THREAD);
@@ -958,6 +976,7 @@ CacheCntlr::processShmemReqFromPrevCache(CacheCntlr* requester, Core::mem_op_t m
       }
       else // last-level cache
       {
+         //printf("xxxx 222\n");
          if (cache_block_info && cache_block_info->getCState() == CacheState::EXCLUSIVE)
          {
             // Data is present, but still no cache_hit => this is a write on a SHARED block. Do Upgrade
@@ -1367,7 +1386,6 @@ CacheCntlr::invalidateCacheBlock(IntPtr address)
 void
 CacheCntlr::retrieveCacheBlock(IntPtr address, Byte* data_buf, ShmemPerfModel::Thread_t thread_num, bool update_replacement)
 {
-   printf("-----------------------review");
    __attribute__((unused)) SharedCacheBlockInfo* cache_block_info = (SharedCacheBlockInfo*) m_master->m_cache->accessSingleLine(
       address, Cache::LOAD, data_buf, getCacheBlockSize(), getShmemPerfModel()->getElapsedTime(thread_num), update_replacement);
    LOG_ASSERT_ERROR(cache_block_info != NULL, "Expected block to be there but it wasn't");
@@ -1440,20 +1458,35 @@ MYLOG("evicting @%lx", evict_address);
       /* TODO: this part looks a lot like updateCacheBlock's dirty case, but with the eviction buffer
          instead of an address, and with a message to the directory at the end. Merge? */
 
-      LOG_PRINT("Eviction: addr(0x%x)", evict_address);
+
       if (! m_master->m_prev_cache_cntlrs.empty()) {
+         IntPtr tag1;
+         UInt32 set_index1;
+         for(CacheCntlrList::iterator it = m_master->m_prev_cache_cntlrs.begin(); it != m_master->m_prev_cache_cntlrs.end(); it++){
+            Cache *L1ca=(*it)->m_master->m_cache;
+            L1ca->splitAddress(evict_address,tag1,set_index1);
+            if(L1ca->m_sets[set_index1]->isIncache(tag1)){
+               printf("Split the eviction address by L1-cache: %s Evict_address %lx evict_tag %lx,evict_index %d isInL1cache: %d\n",
+               L1ca->getName().c_str(), evict_address,
+               tag1,set_index1,L1ca->m_sets[set_index1]->isIncache(tag1));
+            }
+         }
          ScopedLock sl(getLock());
          /* propagate the update to the previous levels. they will write modified data back to our evict buffer when needed */
          m_master->m_evicting_address = evict_address;
          m_master->m_evicting_buf = evict_buf;
 
          SubsecondTime latency = SubsecondTime::Zero();
-         // L2移除，L1也移除
-         for(CacheCntlrList::iterator it = m_master->m_prev_cache_cntlrs.begin(); it != m_master->m_prev_cache_cntlrs.end(); it++)
+         for(CacheCntlrList::iterator it = m_master->m_prev_cache_cntlrs.begin(); it != m_master->m_prev_cache_cntlrs.end(); it++){
+            Cache *L1ca=(*it)->m_master->m_cache;
+            L1ca->splitAddress(evict_address,tag1,set_index1);
+            if(L1ca->m_sets[set_index1]->isIncache(tag1)){
+               continue;
+            }
             latency = getMax<SubsecondTime>(latency, (*it)->updateCacheBlock(evict_address, CacheState::INVALID, Transition::BACK_INVAL, NULL, thread_num).first);
+         }
          getMemoryManager()->incrElapsedTime(latency, thread_num);
          atomic_add_subsecondtime(stats.snoop_latency, latency);
-
          m_master->m_evicting_address = 0;
          m_master->m_evicting_buf = NULL;
       }
@@ -1552,6 +1585,7 @@ MYLOG("evict INV %lx", evict_address);
 std::pair<SubsecondTime, bool>
 CacheCntlr::updateCacheBlock(IntPtr address, CacheState::cstate_t new_cstate, Transition::reason_t reason, Byte* out_buf, ShmemPerfModel::Thread_t thread_num)
 {
+   //printf("updateCacheBlock %s ,address %lx,newState:%d reason:%d \n",m_master->m_cache->getName().c_str(),address,new_cstate,reason);
    MYLOG("updateCacheBlock");
    LOG_ASSERT_ERROR(new_cstate < CacheState::NUM_CSTATE_STATES, "Invalid new cstate %u", new_cstate);
 
@@ -1565,6 +1599,7 @@ CacheCntlr::updateCacheBlock(IntPtr address, CacheState::cstate_t new_cstate, Tr
    if (! m_master->m_prev_cache_cntlrs.empty())
    {
       for(CacheCntlrList::iterator it = m_master->m_prev_cache_cntlrs.begin(); it != m_master->m_prev_cache_cntlrs.end(); it++) {
+         printf("000");
          std::pair<SubsecondTime, bool> res = (*it)->updateCacheBlock(
             address, new_cstate, reason == Transition::EVICT ? Transition::BACK_INVAL : reason, NULL, thread_num);
          // writeback_time is for the complete stack, so only model it at the last level, ignore latencies returned by previous ones
@@ -1663,8 +1698,10 @@ CacheCntlr::updateCacheBlock(IntPtr address, CacheState::cstate_t new_cstate, Tr
             is_writeback = true;
             sibling_hit = true;
          }
-         if (m_coherent)
+         if (m_coherent){
+            //printf("00000\n");
             invalidateCacheBlock(address);
+         }
       }
       else if (new_cstate == CacheState::SHARED)
       {

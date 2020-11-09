@@ -11,14 +11,16 @@
 #include "log.h"
 #include "core.h"
 #include "fault_injection.h"
-#define optfilePathIn "/home/ezra/Desktop/Lab0/optIn.txt"
-#define optfilePathOut "/home/ezra/Desktop/Lab0/optOut.txt"
+//#define optfilePathIn "/home/ezra/Desktop/Lab0/optIn.txt"
+//#define optfilePathOut "/home/ezra/Desktop/Lab0/optOut.txt"
+#define optfilePathIn "optIn.txt"
+#define optfilePathOut "optOut.txt"
 // Define to enable the set usage histogram
 //#define ENABLE_SET_USAGE_HIST
 
 class Cache : public CacheBase
 {
-   private:
+   public:
       bool m_enabled;
 
       // Cache counters

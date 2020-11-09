@@ -50,12 +50,12 @@ namespace ParametricDramDirectoryMSI
       public:
          enum reason_t
          {
-            REASON_FIRST = 0,
+            REASON_FIRST = 0, 
             CORE_RD = REASON_FIRST,
             CORE_WR,
             CORE_RDEX,
             UPGRADE,
-            EVICT,
+            EVICT,  // 5
             BACK_INVAL,
             COHERENCY,
             NUM_REASONS
@@ -201,6 +201,7 @@ namespace ParametricDramDirectoryMSI
    class CacheCntlr : ::CacheCntlr
    {
       private:
+         int inval=0; 
          // Data Members
          MemComponent::component_t m_mem_component;
          MemoryManager* m_memory_manager;

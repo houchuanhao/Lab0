@@ -55,6 +55,7 @@ CacheBlockInfo::create(CacheBase::cache_t cache_type)
 void
 CacheBlockInfo::invalidate()
 {
+   //printf("invalidate \n");
    m_tag = ~0;
    m_cstate = CacheState::INVALID;
 }

@@ -88,19 +88,19 @@ Cache::accessSingleLine(IntPtr addr, access_t access_type,
                         Byte *buff, UInt32 bytes, SubsecondTime now, bool update_replacement)
 {
    //assert((buff == NULL) == (bytes == 0));
-   printf("update_replacement: %d\n",update_replacement);
+   //printf("update_replacement: %d\n",update_replacement);
    IntPtr tag;
    UInt32 set_index;
    UInt32 line_index = -1;
    UInt32 block_offset;
 
    splitAddress(addr, tag, set_index, block_offset);
-   printf("%s ------set_index %x \n",getName().c_str(), set_index);
+   //printf("%s ------set_index %x \n",getName().c_str(), set_index);
    CacheSet *set = m_sets[set_index];
    CacheBlockInfo *cache_block_info = set->find(tag, &line_index);
 
    if (cache_block_info == NULL){
-      printf("%s error!!!\n",getName().c_str());
+      // printf("%s error!!!\n",getName().c_str());
       return NULL;
    }
 
@@ -157,7 +157,10 @@ void Cache::insertSingleLine(IntPtr addr, Byte *fill_buff,
 #endif
 
    delete cache_block_info;
-   printf("%s:address: %lx, insert_tag: %lx ,evict_tag: %lx ,set_index: %d \n",m_name.c_str(),addr,tag,evict_block_info->getTag(),set_index);
+   if(m_name!="itlb_cache"&&m_name!="dtlb_cache"){
+    printf("insert SingleLine %s:address: %lx, insert_tag: %lx ,evict_tag: %lx evict_addr %lx evict_vaild:%d ,set_index %d \n",
+    m_name.c_str(),addr,tag,evict_block_info->getTag(),*evict_addr,*eviction,set_index);
+   }
 }
 
 // Single line cache access at addr

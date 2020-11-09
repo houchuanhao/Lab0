@@ -1,3 +1,4 @@
+cp optOut.txt optIn.txt
 gcc toy-lab0.c -o lab0.exe -Wall -O3 
 echo '***************lab0.exe is OK**************'
 # source activate python2
