@@ -1448,6 +1448,7 @@ MYLOG("evicting @%lx", evict_address);
          m_master->m_evicting_buf = evict_buf;
 
          SubsecondTime latency = SubsecondTime::Zero();
+         // L2移除，L1也移除
          for(CacheCntlrList::iterator it = m_master->m_prev_cache_cntlrs.begin(); it != m_master->m_prev_cache_cntlrs.end(); it++)
             latency = getMax<SubsecondTime>(latency, (*it)->updateCacheBlock(evict_address, CacheState::INVALID, Transition::BACK_INVAL, NULL, thread_num).first);
          getMemoryManager()->incrElapsedTime(latency, thread_num);
